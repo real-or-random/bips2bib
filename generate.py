@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import re
-import os
+from pathlib import Path
 from typing import Optional
 
 BIP_ALIASES: dict[int, str] = {
@@ -41,37 +41,37 @@ def escape_tex(s: str) -> str:
     return "".join(ESCAPE_CHARS.get(c, c) for c in s)
 
 
-def find_bip_files(bips_dir: str) -> list[str]:
+def find_bip_files(bips_dir: Path) -> list[Path]:
     """Find BIP files in bips_dir.
 
     Args:
-        bips_dir (str): Directory to search.
+        bips_dir (Path): Directory to search.
 
     Returns:
-        list[str]: List of file paths.
+        list[Path]: List of file paths.
     """
-    bip_files: list[str] = []
+    bip_files: list[Path] = []
     try:
-        for fname in os.listdir(bips_dir):
-            if re.match(r"^bip-\d+\.(mediawiki|md)$", fname):
-                bip_files.append(os.path.join(bips_dir, fname))
+        for path in bips_dir.iterdir():
+            if path.is_file() and re.match(r"^bip-\d+\.(mediawiki|md)$", path.name):
+                bip_files.append(path)
     except Exception as e:
         raise SystemExit(f"ERROR: Failed to list files in {bips_dir!r}: {e}")
     return bip_files
 
 
-def extract_preamble(path: str) -> Optional[list[str]]:
+def extract_preamble(path: Path) -> Optional[list[str]]:
     """Extract the preamble lines from a BIP file.
 
     Args:
-        path (str): Path to the BIP file.
+        path (Path): Path to the BIP file.
 
     Returns:
         Optional[list[str]]: List of preamble lines if found, else None.
     """
-    with open(path, encoding="utf-8") as f:
+    with path.open(encoding="utf-8") as f:
         content = f.read()
-    if path.endswith(".mediawiki"):
+    if path.suffix == ".mediawiki":
         m = re.search(r"<pre>\s*(.*?)\s*</pre>", content, re.DOTALL)
     else:
         m = re.search(r"```(.*?)```", content, re.DOTALL)
@@ -121,12 +121,12 @@ def strip_email(author: str) -> str:
     return re.sub(r"<[^>]+>", "", author).strip()
 
 
-def bib_entry(fields: dict[str, list[str]], fname: str) -> Optional[tuple[int, str]]:
+def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, str]]:
     """Create a BibTeX entry for the BIP.
 
     Args:
         fields (dict[str, list[str]]): Parsed preamble fields.
-        fname (str): Filename of the BIP.
+        fname (Path): Filename of the BIP.
 
     Returns:
         Optional[tuple[int, str]]: Tuple of bip_num and BibTeX entry string if data is sufficient, else None.
@@ -135,7 +135,7 @@ def bib_entry(fields: dict[str, list[str]], fname: str) -> Optional[tuple[int, s
     title: str = fields.get("Title", [""])[0]
     authors: str = fields.get("Author", [""])[0]
     year: str = fields.get("Created", [""])[0][:4]
-    url: str = f"https://github.com/bitcoin/bips/blob/master/{os.path.basename(fname)}"
+    url: str = f"https://github.com/bitcoin/bips/blob/master/{fname.name}"
 
     if (
         not bip_num_str
@@ -168,18 +168,18 @@ def bib_entry(fields: dict[str, list[str]], fname: str) -> Optional[tuple[int, s
     return bip_num, entry
 
 
-def generate_bib(bips_dir: str, out_path: str) -> None:
+def generate_bib(bips_dir: Path, out_path: Path) -> None:
     """Generate .bib file from BIP preambles.
 
     Args:
-        bips_dir (str): Root directory of the bitcoin/bips repo.
-        out_path (str): Output .bib file path.
+        bips_dir (Path): Root directory of the bitcoin/bips repo.
+        out_path (Path): Output .bib file path.
 
     Raises:
         RuntimeError: If bips_dir does not exist or is not a directory, or if no
             BIP files are found.
     """
-    if not os.path.isdir(bips_dir):
+    if not bips_dir.is_dir():
         raise RuntimeError(f"{bips_dir!r} does not exist or is not a directory.")
     bip_files = find_bip_files(bips_dir)
     if not bip_files:
@@ -194,7 +194,7 @@ def generate_bib(bips_dir: str, out_path: str) -> None:
         if result:
             bib_entries.append(result)
     bib_entries.sort(key=lambda x: x[0])
-    with open(out_path, "w", encoding="utf-8") as out:
+    with out_path.open("w", encoding="utf-8") as out:
         out.writelines(entry for _, entry in bib_entries)
     print(f"Wrote {len(bib_entries)} entries to {out_path}.")
 
@@ -211,4 +211,4 @@ if __name__ == "__main__":
         "-o", "--output", default=default_output, help="Output .bib file"
     )
     args = parser.parse_args()
-    generate_bib(args.bips_dir, args.output)
+    generate_bib(Path(args.bips_dir), Path(args.output))
