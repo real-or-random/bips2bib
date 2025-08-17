@@ -69,7 +69,7 @@ def extract_preamble(path: Path) -> Optional[list[str]]:
     Returns:
         Optional[list[str]]: List of preamble lines if found, else None.
     """
-    with path.open(encoding="utf-8") as f:
+    with path.open() as f:
         content = f.read()
     if path.suffix == ".mediawiki":
         m = re.search(r"<pre>\s*(.*?)\s*</pre>", content, re.DOTALL)
@@ -194,7 +194,7 @@ def generate_bib(bips_dir: Path, out_path: Path) -> None:
         if result:
             bib_entries.append(result)
     bib_entries.sort(key=lambda x: x[0])
-    with out_path.open("w", encoding="utf-8") as out:
+    with out_path.open("w") as out:
         out.writelines(entry for _, entry in bib_entries)
     print(f"Wrote {len(bib_entries)} entries to {out_path}.")
 
