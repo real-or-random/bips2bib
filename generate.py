@@ -68,13 +68,18 @@ def extract_preamble(path: Path) -> Optional[list[str]]:
 
     Returns:
         Optional[list[str]]: List of preamble lines if found, else None.
+
+    Raises:
+        ValueError: If the file has an unsupported suffix.
     """
     with path.open() as f:
         content = f.read()
     if path.suffix == ".mediawiki":
         m = re.search(r"<pre>\s*(.*?)\s*</pre>", content, re.DOTALL)
-    else:
+    elif path.suffix == ".md":
         m = re.search(r"```(.*?)```", content, re.DOTALL)
+    else:
+        raise ValueError(f"File {path} has unsupported suffix")
     if not m:
         return None
     lines = m.group(1).splitlines()
