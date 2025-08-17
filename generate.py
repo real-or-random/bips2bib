@@ -51,12 +51,9 @@ def find_bip_files(bips_dir: Path) -> list[Path]:
         list[Path]: List of file paths.
     """
     bip_files: list[Path] = []
-    try:
-        for path in bips_dir.iterdir():
-            if path.is_file() and re.match(r"^bip-\d+\.(mediawiki|md)$", path.name):
-                bip_files.append(path)
-    except Exception as e:
-        raise SystemExit(f"ERROR: Failed to list files in {bips_dir!r}: {e}")
+    for path in bips_dir.iterdir():
+        if path.is_file() and re.match(r"^bip-\d+\.(mediawiki|md)$", path.name):
+            bip_files.append(path)
     return bip_files
 
 
@@ -181,11 +178,8 @@ def generate_bib(bips_dir: Path, out_path: Path) -> None:
         out_path (Path): Output .bib file path.
 
     Raises:
-        RuntimeError: If bips_dir does not exist or is not a directory, or if no
-            BIP files are found.
+        RuntimeError: If there are no BIP files.
     """
-    if not bips_dir.is_dir():
-        raise RuntimeError(f"{bips_dir!r} does not exist or is not a directory.")
     bip_files = find_bip_files(bips_dir)
     if not bip_files:
         raise RuntimeError(f'No BIP files found in directory "{bips_dir}"')
