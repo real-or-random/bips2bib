@@ -147,7 +147,7 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
         or not year
     ):
         print(
-            f"WARNING: Insufficient data for BibTeX entry in {fname}: "
+            f"WARNING: Skipping {fname} due to insufficient data: "
             f"BIP={bip_num_str!r} Title={title!r} Author={authors!r} Year={year!r}"
         )
         return None
