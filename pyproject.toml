@@ -11,6 +11,9 @@ license-files = ["LICEN[CS]E.*"]
 requires-python = ">=3.10"
 dependencies = []
 
+[project.urls]
+homepage = "https://github.com/real-or-random/bips2bip"
+
 [project.scripts]
 bips2bib = "bips2bib.cli:app"
 
