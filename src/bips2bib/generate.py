@@ -153,7 +153,7 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
         return None
 
     bip_num: int = int(bip_num_str)
-    lines: list[str] = [f"@manual{{bip:{bip_num},"]
+    lines: list[str] = [f"@techreport{{bip:{bip_num},"]
     if bip_num in BIP_ALIASES:
         lines.append(f"  ids          = {{bip:{escape_tex(BIP_ALIASES[bip_num])}}},")
     lines.append(f"  shorthand    = {{BIP{bip_num}}},")
@@ -162,7 +162,7 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
     lines.append(f"  year         = {{{escape_tex(year)}}},")
     lines.append(f"  url          = {{{escape_tex(url)}}},")
     lines.append(
-        f"  series       = {{{escape_tex('Bitcoin Improvement Proposal (BIP)')}}},"
+        f"  type         = {{{escape_tex('Bitcoin Improvement Proposal (BIP)')}}},"
     )
     lines.append(f"  number       = {{{bip_num}}},")
     lines.append("}\n")
