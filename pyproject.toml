@@ -6,6 +6,8 @@ readme = "README.md"
 authors = [
     { name = "Tim Ruffing", email = "me@real-or-random.org" }
 ]
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
 requires-python = ">=3.10"
 dependencies = []
 
