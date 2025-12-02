@@ -1,0 +1,17 @@
+[project]
+name = "bips2bib"
+version = "1.0.0"
+description = "Generate a BibTeX file from the BIPs repository (Bitcoin Improvement Proposals)" 
+readme = "README.md"
+authors = [
+    { name = "Tim Ruffing", email = "me@real-or-random.org" }
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+bips2bib = "bips2bib.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"

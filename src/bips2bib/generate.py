@@ -197,17 +197,3 @@ def generate_bib(bips_dir: Path, out_path: Path) -> None:
         out.writelines(entry for _, entry in bib_entries)
     print(f"Wrote {len(bib_entries)} entries to {out_path}.")
 
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Parse BIP preambles and generate a .bib file."
-    )
-    parser.add_argument("bips_dir", help="Root directory of the bitcoin/bips repo")
-    default_output = "bips.bib"
-    parser.add_argument(
-        "-o", "--output", default=default_output, help="Output .bib file"
-    )
-    args = parser.parse_args()
-    generate_bib(Path(args.bips_dir), Path(args.output))
