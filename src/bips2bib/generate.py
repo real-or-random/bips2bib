@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from typing import Optional
 import importlib.metadata
+from bips2bib.titlecase import titlecase
 
 BIP_ALIASES: dict[int, str] = {
     32: "hdwallets",
@@ -16,22 +17,26 @@ BIP_ALIASES: dict[int, str] = {
     349: "internalkey",
 }
 
-ESCAPE_CHARS: dict[str, str] = {
+ESCAPE_CURLY_BRACES: dict[str, str] = {
+    "{": r"\{",
+    "}": r"\}",
+}
+
+ESCAPE_NO_CURLY_BRACES: dict[str, str] = {
     "&": r"\&",
     "%": r"\%",
     "$": r"\$",
     "#": r"\#",
     "_": r"\_",
-    "{": r"\{",
-    "}": r"\}",
     "~": r"\textasciitilde{}",
     "^": r"\textasciicircum{}",
     "\\": r"\textbackslash{}",
 }
 
+ESCAPE_ALL = ESCAPE_CURLY_BRACES.copy() | ESCAPE_NO_CURLY_BRACES
 
-def escape_tex(s: str) -> str:
-    """Escape special TeX characters in a string.
+def escape_curly_braces(s: str) -> str:
+    """TeX-Escape curly braces in a string.
 
     Args:
         s (str): Input string.
@@ -39,7 +44,21 @@ def escape_tex(s: str) -> str:
     Returns:
         str: Escaped TeX string.
     """
-    return "".join(ESCAPE_CHARS.get(c, c) for c in s)
+    return "".join(ESCAPE_CURLY_BRACES.get(c, c) for c in s)
+
+
+def escape_tex(s: str, curly_braces=True) -> str:
+    """TeX-Escape special TeX characters in a string
+
+    Args:
+        s (str): Input string.
+        curly_braces (bool): Whether to also escape curly braces.
+
+    Returns:
+        str: Escaped TeX string.
+    """
+    escape_map = ESCAPE_ALL if curly_braces else ESCAPE_NO_CURLY_BRACES
+    return "".join(escape_map.get(c, c) for c in s)
 
 
 def find_bip_files(bips_dir: Path) -> list[Path]:
@@ -122,7 +141,7 @@ def strip_email(author: str) -> str:
         str: Author name without email.
     """
     return re.sub(r"<[^>]+>", "", author).strip()
-
+    
 
 def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, str]]:
     """Create a BibTeX entry for the BIP.
@@ -154,12 +173,14 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
         return None
 
     bip_num: int = int(bip_num_str)
+    title = titlecase(escape_curly_braces(title))
+
     lines: list[str] = [f"@techreport{{bip:{bip_num:04},"]
     if bip_num in BIP_ALIASES:
         lines.append(f"  ids          = {{bip:{escape_tex(BIP_ALIASES[bip_num])}}},")
     lines.append(f"  shorthand    = {{BIP{bip_num}}},")
     lines.append(f"  author       = {{{escape_tex(authors)}}},")
-    lines.append(f"  title        = {{{escape_tex(title)}}},")
+    lines.append(f"  title        = {{{escape_tex(title, curly_braces=False)}}},")
     lines.append(f"  year         = {{{escape_tex(year)}}},")
     lines.append(f"  url          = {{{escape_tex(url)}}},")
     lines.append(
