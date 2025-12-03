@@ -2,6 +2,7 @@ from pathlib import Path
 
 from bips2bib.generate import generate_bib
 
+
 def app() -> None:
     import argparse
 

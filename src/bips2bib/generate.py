@@ -173,7 +173,7 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
 
 def bib_intro() -> str:
     """Return BibTeX comment with project homepage."""
-    metadata = importlib.metadata.metadata(__package__.split('.')[0])
+    metadata = importlib.metadata.metadata(__package__.split(".")[0])
     homepage = dict(
         e.split(", ", 1) for e in metadata.get_all("Project-URL") or []
     ).get("homepage")
@@ -211,4 +211,3 @@ def generate_bib(bips_dir: Path, out_path: Path) -> None:
         out.write(f"{bib_intro()}\n\n")
         out.writelines(entry for _, entry in bib_entries)
     print(f"Wrote {len(bib_entries)} entries to {out_path}.")
-
