@@ -35,6 +35,7 @@ ESCAPE_NO_CURLY_BRACES: dict[str, str] = {
 
 ESCAPE_ALL = ESCAPE_CURLY_BRACES.copy() | ESCAPE_NO_CURLY_BRACES
 
+
 def escape_curly_braces(s: str) -> str:
     """TeX-Escape curly braces in a string.
 
@@ -141,7 +142,7 @@ def strip_email(author: str) -> str:
         str: Author name without email.
     """
     return re.sub(r"<[^>]+>", "", author).strip()
-    
+
 
 def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, str]]:
     """Create a BibTeX entry for the BIP.
@@ -183,9 +184,7 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
     lines.append(f"  title        = {{{escape_tex(title, curly_braces=False)}}},")
     lines.append(f"  year         = {{{escape_tex(year)}}},")
     lines.append(f"  url          = {{{escape_tex(url)}}},")
-    lines.append(
-        f"  type         = {{{escape_tex('Bitcoin Improvement Proposal (BIP)')}}},"
-    )
+    lines.append("  type         = {{Bitcoin} Improvement Proposal {(BIP)}},")
     lines.append(f"  number       = {{{bip_num}}},")
     lines.append("}\n")
     entry: str = "\n".join(lines)
