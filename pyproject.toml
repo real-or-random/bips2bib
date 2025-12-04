@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.urls]
-homepage = "https://github.com/real-or-random/bips2bip"
+homepage = "https://github.com/real-or-random/bips2bib"
 
 [project.scripts]
 bips2bib = "bips2bib.cli:app"
