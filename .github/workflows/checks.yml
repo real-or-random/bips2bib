@@ -1,0 +1,30 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  ruff:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uvx ruff check
+
+  ruff_format:
+    name: ruff format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uvx ruff format --diff
+
+  ty:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uvx ty check
