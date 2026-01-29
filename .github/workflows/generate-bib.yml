@@ -28,7 +28,7 @@ jobs:
         run: uv run bips2bib bips -o bips.bib
 
       - name: Upload bips.bib artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: BibTeX file
           path: bips.bib
