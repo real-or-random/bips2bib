@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import re
 from pathlib import Path
-from typing import Optional
 import importlib.metadata
 from bips2bib.titlecase import titlecase
 
@@ -78,14 +77,14 @@ def find_bip_files(bips_dir: Path) -> list[Path]:
     return bip_files
 
 
-def extract_preamble(path: Path) -> Optional[list[str]]:
+def extract_preamble(path: Path) -> list[str] | None:
     """Extract the preamble lines from a BIP file.
 
-    Args:
+    Args:f
         path (Path): Path to the BIP file.
 
     Returns:
-        Optional[list[str]]: List of preamble lines if found, else None.
+        list[str] | None: List of preamble lines if found, else None.
 
     Raises:
         ValueError: If the file has an unsupported suffix.
@@ -114,7 +113,7 @@ def parse_preamble(lines: list[str]) -> dict[str, list[str]]:
         dict[str, list[str]]: Parsed fields as dictionary.
     """
     fields: dict[str, list[str]] = {}
-    key: Optional[str] = None
+    key: str | None = None
     for line in lines:
         m = re.match(r"^\s*([A-Za-z0-9\-]+):\s*(.*)$", line)
         if m:
@@ -144,7 +143,7 @@ def strip_email(author: str) -> str:
     return re.sub(r"<[^>]+>", "", author).strip()
 
 
-def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, str]]:
+def bib_entry(fields: dict[str, list[str]], fname: Path) -> tuple[int, str] | None:
     """Create a BibTeX entry for the BIP.
 
     Args:
@@ -152,7 +151,7 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> Optional[tuple[int, 
         fname (Path): Filename of the BIP.
 
     Returns:
-        Optional[tuple[int, str]]: Tuple of bip_num and BibTeX entry string if data is sufficient, else None.
+        tuple[int, str] | None: Tuple of bip_num and BibTeX entry string if data is sufficient, else None.
     """
     bip_num_str: str = fields.get("BIP", [""])[0]
     title: str = fields.get("Title", [""])[0]
