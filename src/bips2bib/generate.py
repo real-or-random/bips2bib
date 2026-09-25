@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+import importlib.metadata
 import re
 from pathlib import Path
-import importlib.metadata
+
 from bips2bib.titlecase import titlecase
 
 BIP_ALIASES: dict[int, str] = {
@@ -124,7 +125,7 @@ def parse_preamble(lines: list[str]) -> dict[str, list[str]]:
         elif key is not None:
             fields[key].append(line.strip())
     for k, v in fields.items():
-        if k == "Author":
+        if k in {"Author", "Authors"}:
             fields[k] = [" and ".join([strip_email(a) for a in v if a])]
         else:
             fields[k] = [" ".join([x for x in v if x])]
@@ -143,6 +144,21 @@ def strip_email(author: str) -> str:
     return re.sub(r"<[^>]+>", "", author).strip()
 
 
+def first_field(fields: dict[str, list[str]], *keys: str) -> str:
+    """Return the first non-empty field value for the given keys."""
+    for key in keys:
+        value = fields.get(key, [""])[0]
+        if value:
+            return value
+    return ""
+
+
+def extract_year(date: str) -> str:
+    """Extract a 4-digit year from a date string."""
+    match = re.search(r"\b\d{4}\b", date)
+    return match.group(0) if match else ""
+
+
 def bib_entry(fields: dict[str, list[str]], fname: Path) -> tuple[int, str] | None:
     """Create a BibTeX entry for the BIP.
 
@@ -155,8 +171,8 @@ def bib_entry(fields: dict[str, list[str]], fname: Path) -> tuple[int, str] | No
     """
     bip_num_str: str = fields.get("BIP", [""])[0]
     title: str = fields.get("Title", [""])[0]
-    authors: str = fields.get("Author", [""])[0]
-    year: str = fields.get("Created", [""])[0][:4]
+    authors: str = first_field(fields, "Author", "Authors")
+    year: str = extract_year(first_field(fields, "Created", "Assigned"))
     url: str = f"https://github.com/bitcoin/bips/blob/master/{fname.name}"
 
     if (
